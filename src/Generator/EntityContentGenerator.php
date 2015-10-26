@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\Generator\EntityContentGenerator.
+ * Contains \Drupal\Console\Generator\EntityContentGenerator.
  */
 
-namespace Drupal\AppConsole\Generator;
+namespace Drupal\Console\Generator;
 
 class EntityContentGenerator extends Generator
 {
@@ -121,12 +121,14 @@ class EntityContentGenerator extends Generator
             $parameters
         );
 
-        $content = $this->renderView(
+        $content = $this->getRenderHelper()->render(
             'module/src/Entity/entity-content.theme.php.twig',
             $parameters
         );
 
-        echo 'Add this to your hook_theme:'.PHP_EOL;
-        echo $content;
+        if ($this->isLearning()) {
+            echo 'Add this to your hook_theme:'.PHP_EOL;
+            echo $content;
+        }
     }
 }

@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\Command\ModuleInstallCommand.
+ * Contains \Drupal\Console\Command\ModuleInstallCommand.
  */
 
-namespace Drupal\AppConsole\Command;
+namespace Drupal\Console\Command;
 
 use Drupal\Core\Config\PreExistingConfigException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -188,6 +188,9 @@ class ModuleInstallCommand extends ContainerAwareCommand
             $output->writeln('[+] <error>' . $e->getMessage() . '</error>');
             return;
         }
+
+        // Run cache rebuild to see changes in Web UI
+        $this->getChain()->addCommand('cache:rebuild', ['cache' => 'discovery']);
     }
 
     protected function overwriteConfig(PreExistingConfigException $e, $module_list, $modules, $dependencies, $overwrite_config, $output)

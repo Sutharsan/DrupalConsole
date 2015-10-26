@@ -2,12 +2,11 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\EventSubscriber\ShowWelcomeMessage.
+ * Contains \Drupal\Console\EventSubscriber\ShowWelcomeMessageListener.
  */
 
-namespace Drupal\AppConsole\EventSubscriber;
+namespace Drupal\Console\EventSubscriber;
 
-use Drupal\AppConsole\Command\Helper\TranslatorHelper;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -20,17 +19,14 @@ class ShowWelcomeMessageListener implements EventSubscriberInterface
     public function showMessage(ConsoleCommandEvent $event)
     {
         /**
-         * @var \Drupal\AppConsole\Command\Command $command
+         * @var \Drupal\Console\Command\Command $command
          */
         $command = $event->getCommand();
         $output = $event->getOutput();
 
         $application = $command->getApplication();
-        $messageHelper = $application->getHelperSet()->get('message');
-        /**
-         * @var TranslatorHelper
-         */
-        $translatorHelper = $application->getHelperSet()->get('translator');
+        $messageHelper = $application->getMessageHelper();
+        $translatorHelper = $application->getTranslator();
 
         $welcomeMessageKey = 'commands.'.str_replace(':', '.', $command->getName()).'.welcome';
         $welcomeMessage = $translatorHelper->trans($welcomeMessageKey);

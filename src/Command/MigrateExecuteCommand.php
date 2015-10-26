@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\Command\MigrateExecuteCommand.
+ * Contains \Drupal\Console\Command\MigrateExecuteCommand.
  */
 
-namespace Drupal\AppConsole\Command;
+namespace Drupal\Console\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Drupal\Core\Database\Database;
 use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\migrate\MigrateExecutable;
-use Drupal\AppConsole\Command\migrate_upgrade\MigrateExecuteMessageCapture;
+use Drupal\Console\Utils\MigrateExecuteMessageCapture;
 
 class MigrateExecuteCommand extends ContainerAwareCommand
 {
@@ -186,7 +186,7 @@ class MigrateExecuteCommand extends ContainerAwareCommand
         $input->setOption('db-port', $db_port);
 
         // Get migrations available
-        $this->registerSourceDB($input);
+        $this->registerSourceDB($input, $output);
 
         $this->getConnection($output);
 
@@ -198,12 +198,6 @@ class MigrateExecuteCommand extends ContainerAwareCommand
             $migrations_list = $this->getMigrations($this->migration_group);
         } else {
             $output->writeln('[+] <error>'.$this->trans('commands.migrate.execute.questions.wrong-source').'</error>');
-
-            return;
-        }
-
-        if (count($migrations_list) == 0) {
-            $output->writeln('[+] <error>'.$this->trans('commands.migrate.execute.messages.no-migrations').'</error>');
 
             return;
         }
@@ -291,7 +285,7 @@ class MigrateExecuteCommand extends ContainerAwareCommand
         return $this;
     }
 
-    protected function registerSourceDB(InputInterface $input)
+    protected function registerSourceDB(InputInterface $input, OutputInterface $output)
     {
         $db_host = $input->getOption('db-host');
         $db_name = $input->getOption('db-name');
@@ -326,8 +320,7 @@ class MigrateExecuteCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $migration_ids = $input->getArgument('migration-ids');
-        $exclude_ids = $input->getArgument('exclude');
-
+        $exclude_ids = $input->getOption('exclude');
         if (!empty($exclude_ids)) {
             // Remove exclude migration from migration script
             $migration_ids = array_diff($migration_ids, $exclude_ids);
@@ -339,7 +332,7 @@ class MigrateExecuteCommand extends ContainerAwareCommand
         }
 
         if (!$this->connection) {
-            $this->registerSourceDB($input);
+            $this->registerSourceDB($input, $output);
             $this->getConnection($output);
         }
 
@@ -351,7 +344,10 @@ class MigrateExecuteCommand extends ContainerAwareCommand
 
         $entity_manager = $this->getEntityManager();
         $migration_storage = $entity_manager->getStorage('migration');
-
+        if (count($migrations) == 0) {
+            $output->writeln('[+] <error>'.$this->trans('commands.migrate.execute.messages.no-migrations').'</error>');
+            return;
+        }
         foreach ($migrations as $migration_id) {
             $output->writeln(
                 '[+] <info>'.sprintf(

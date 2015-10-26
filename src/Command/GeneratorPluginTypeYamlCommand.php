@@ -2,19 +2,19 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\Command\GeneratorPluginTypeYamlCommand.
+ * Contains \Drupal\Console\Command\GeneratorPluginTypeYamlCommand.
  */
 
-namespace Drupal\AppConsole\Command;
+namespace Drupal\Console\Command;
 
-use Drupal\AppConsole\Generator\PluginTypeYamlGenerator;
+use Drupal\Console\Generator\PluginTypeYamlGenerator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Drupal\AppConsole\Command\Helper\ServicesTrait;
-use Drupal\AppConsole\Command\Helper\ModuleTrait;
-use Drupal\AppConsole\Command\Helper\FormTrait;
-use Drupal\AppConsole\Command\Helper\ConfirmationTrait;
+use Drupal\Console\Command\ServicesTrait;
+use Drupal\Console\Command\ModuleTrait;
+use Drupal\Console\Command\FormTrait;
+use Drupal\Console\Command\ConfirmationTrait;
 
 class GeneratorPluginTypeYamlCommand extends GeneratorCommand
 {
@@ -71,7 +71,7 @@ class GeneratorPluginTypeYamlCommand extends GeneratorCommand
         // --module option
         $module = $input->getOption('module');
         if (!$module) {
-            // @see Drupal\AppConsole\Command\Helper\ModuleTrait::moduleQuestion
+            // @see Drupal\Console\Command\ModuleTrait::moduleQuestion
             $module = $this->moduleQuestion($output, $dialog);
         }
         $input->setOption('module', $module);
@@ -90,7 +90,7 @@ class GeneratorPluginTypeYamlCommand extends GeneratorCommand
         }
         $input->setOption('class-name', $class_name);
 
-        $default_plugin_name = $this->getStringUtils()->camelCaseToUnderscore($class_name);
+        $default_plugin_name = $this->getStringHelper()->camelCaseToUnderscore($class_name);
 
         // --plugin-name option
         $plugin_name = $input->getOption('plugin-name');

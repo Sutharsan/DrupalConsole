@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\Command\MigrateDebugCommand.
+ * Contains \Drupal\Console\Command\MigrateDebugCommand.
  */
 
-namespace Drupal\AppConsole\Command;
+namespace Drupal\Console\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -31,7 +31,7 @@ class MigrateDebugCommand extends ContainerAwareCommand
     {
         $drupal_version = $input->getArgument('drupal-version');
 
-        $table = $this->getHelperSet()->get('table');
+        $table = $this->getTableHelper();
         $table->setlayout($table::LAYOUT_COMPACT);
         $this->getAllMigrations($drupal_version, $output, $table);
     }

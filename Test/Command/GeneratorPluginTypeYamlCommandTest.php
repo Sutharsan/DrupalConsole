@@ -1,67 +1,58 @@
 <?php
 /**
  * @file
- * Contains \Drupal\AppConsole\Test\Command\GeneratorPluginTypeYamlCommandTest.
+ * Contains \Drupal\Console\Test\Command\GeneratorPluginTypeYamlCommandTest.
  */
 
-namespace Drupal\AppConsole\Test\Command;
+namespace Drupal\Console\Test\Command;
 
+use Drupal\Console\Command\GeneratorPluginTypeYamlCommand;
 use Symfony\Component\Console\Tester\CommandTester;
+use Drupal\Console\Test\DataProvider\PluginTypeYamlDataProviderTrait;
 
 class GeneratorPluginTypeYamlCommandTest extends GenerateCommandTest
 {
+    use PluginTypeYamlDataProviderTrait;
+
     /**
-     * @dataProvider getDataInteractive
+     * Plugin type yaml generator test
+     *
+     * @param $module
+     * @param $plugin_class
+     * @param $plugin_name
+     * @param $plugin_file_name
+     *
+     * @dataProvider commandData
      */
-    public function testInteractiveCommand($options, $expected, $input)
-    {
-        list($module, $plugin_class, $plugin_name, $plugin_file_name) = $expected;
+    public function testGeneratePluginTypeYaml(
+        $module,
+        $plugin_class,
+        $plugin_name,
+        $plugin_file_name
+    ) {
+        $command = new GeneratorPluginTypeYamlCommand($this->getHelperSet());
+        $command->setHelperSet($this->getHelperSet());
+        $command->setGenerator($this->getGenerator());
 
-        $generator = $this->getGenerator();
+        $commandTester = new CommandTester($command);
 
-        $generator
-            ->expects($this->once())
-            ->method('generate')
-            ->with($module, $plugin_class, $plugin_name, $plugin_file_name);
+        $code = $commandTester->execute(
+            [
+              '--module'            => $module,
+              '--class-name'        => $plugin_class,
+              '--plugin-name'       => $plugin_name,
+              '--plugin-file-name'  => $plugin_file_name
+            ],
+            ['interactive' => false]
+        );
 
-        $command = $this->getCommand($generator, $input);
-        $cmd = new CommandTester($command);
-        $cmd->execute($options);
-    }
-
-    public function getDataInteractive()
-    {
-        return [
-          [
-            [],
-            ['Foo', 'MyPlugin', 'my_plugin', 'my.plugin'],
-            "Foo\nMyPlugin\nmy_plugin\nmy.plugin\nyes\n"
-          ],
-        ];
-    }
-
-    public function getCommand($generator, $input)
-    {
-        $command = $this->getMockBuilder('Drupal\AppConsole\Command\GeneratorPluginTypeYamlCommand')
-            ->setMethods(['getModules', 'getServices', '__construct'])
-            ->setConstructorArgs([$this->getTranslatorHelper()])
-            ->getMock();
-
-        $command->expects($this->any())
-            ->method('getModules')
-            ->will($this->returnValue(['Foo']));
-
-        $command->setGenerator($generator);
-        $command->setContainer($this->getContainer());
-        $command->setHelperSet($this->getHelperSet($input));
-
-        return $command;
+        $this->assertEquals(0, $code);
     }
 
     private function getGenerator()
     {
         return $this
-            ->getMockBuilder('Drupal\AppConsole\Generator\PluginTypeYamlGenerator')
+            ->getMockBuilder('Drupal\Console\Generator\PluginTypeYamlGenerator')
             ->disableOriginalConstructor()
             ->setMethods(['generate'])
             ->getMock();

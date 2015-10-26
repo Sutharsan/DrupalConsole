@@ -23,8 +23,11 @@ Drupal Console
 The Drupal Console is a suite of tools that you run on a command line interface (CLI)
 to generate boilerplate code and interact with a Drupal 8 installation.
 
+## Change Log
+All notable changes to this project will be documented in the [releases page](https://github.com/hechoendrupal/DrupalConsole/releases) 
+
 ## Supported Drupal version
-The Drupal 8 supported version is [Drupal 8 Beta 14](http://ftp.drupal.org/files/projects/drupal-8.0.0-beta14.tar.gz).
+The Drupal 8 supported version is [Drupal 8 RC 1](http://ftp.drupal.org/files/projects/drupal-8.0.0-rc1.tar.gz).
 
 ## Drupal Console documentation
 You can read or download the Drupal Console documentation at [bit.ly/console-book](http://bit.ly/console-book).
@@ -45,8 +48,11 @@ php -r "readfile('http://drupalconsole.com/installer');" | php
 # For example: move console.phar and rename it, 'drupal':
 mv console.phar /usr/local/bin/drupal
 
-# Show all available Drupal Console commands.
-drupal
+# Show all available commands.
+drupal list
+
+# Copy configuration files.
+drupal init
 
 # Generate a module.
 drupal generate:module
@@ -55,7 +61,24 @@ drupal generate:module
 ## Using Drupal Console
 ![image](http://drupalconsole.com/assets/img/console-global.gif)
 
+## Enabling Autocomplete
+```
+# You can enable autocomplete by executing
+drupal init
+
+# Bash: Bash support depends on the http://bash-completion.alioth.debian.org/
+# project which can be installed with your package manager of choice. Then add 
+# this line to your shell configuration file.
+source "$HOME/.console/console.rc" 2>/dev/null
+
+# Zsh: Add this line to your shell configuration file.
+source "$HOME/.console/console.rc" 2>/dev/null
+
+# Fish: Create a symbolic link
+ln -s ~/.console/drupal.fish ~/.config/fish/completions/drupal.fish
+```
+
 ## Supporting organizations
 [![FFW](https://www.drupal.org/files/ffw-logo.png)](https://ffwagency.com)  
 [![Indava](https://www.drupal.org/files/indava-logo.png)](http://www.indava.com/)  
-[![Anexus IT](https://www.drupal.org/files/anexusit-logo.png)](http://www.anexusit.com/)
+[![Anexus](https://www.drupal.org/files/anexus-logo.png)](http://www.anexusit.com/)

@@ -2,16 +2,16 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\Command\GeneratorModuleCommand.
+ * Contains \Drupal\Console\Command\GeneratorModuleCommand.
  */
 
-namespace Drupal\AppConsole\Command;
+namespace Drupal\Console\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Drupal\AppConsole\Generator\ModuleGenerator;
-use Drupal\AppConsole\Command\Helper\ConfirmationTrait;
+use Drupal\Console\Generator\ModuleGenerator;
+use Drupal\Console\Command\ConfirmationTrait;
 
 class GeneratorModuleCommand extends GeneratorCommand
 {
@@ -63,9 +63,15 @@ class GeneratorModuleCommand extends GeneratorCommand
                 $this->trans('commands.generate.module.options.package')
             )
             ->addOption(
+                'feature',
+                false,
+                InputOption::VALUE_NONE,
+                $this->trans('commands.generate.module.options.feature')
+            )
+            ->addOption(
                 'composer',
                 false,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_NONE,
                 $this->trans('commands.generate.module.options.composer')
             )
             ->addOption(
@@ -82,8 +88,8 @@ class GeneratorModuleCommand extends GeneratorCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $dialog = $this->getDialogHelper();
-        $validators = $this->getHelperSet()->get('validators');
-        $messageHelper = $this->getHelperSet()->get('message');
+        $validators = $this->getValidator();
+        $messageHelper = $this->getMessageHelper();
 
         if ($this->confirmationQuestion($input, $output, $dialog)) {
             return;
@@ -91,8 +97,8 @@ class GeneratorModuleCommand extends GeneratorCommand
 
         $module = $validators->validateModuleName($input->getOption('module'));
 
-        $drupalAutoLoad = $this->getHelperSet()->get('drupal-autoload');
-        $drupal_root = $drupalAutoLoad->getDrupalRoot();
+        $drupal = $this->getDrupalHelper();
+        $drupal_root = $drupal->getRoot();
         $module_path = $drupal_root.$input->getOption('module-path');
         $module_path = $validators->validateModulePath($module_path, true);
 
@@ -100,6 +106,7 @@ class GeneratorModuleCommand extends GeneratorCommand
         $description = $input->getOption('description');
         $core = $input->getOption('core');
         $package = $input->getOption('package');
+        $feature = $input->getOption('feature');
         $composer = $input->getOption('composer');
         /*
          * Modules Dependencies
@@ -127,6 +134,7 @@ class GeneratorModuleCommand extends GeneratorCommand
             $description,
             $core,
             $package,
+            $feature,
             $composer,
             $dependencies
         );
@@ -175,14 +183,14 @@ class GeneratorModuleCommand extends GeneratorCommand
      */
     protected function interact(InputInterface $input, OutputInterface $output)
     {
-        $stringUtils = $this->getHelperSet()->get('stringUtils');
-        $validators = $this->getHelperSet()->get('validators');
+        $stringUtils = $this->getStringHelper();
+        $validators = $this->getValidator();
         $dialog = $this->getDialogHelper();
 
         try {
             $module = $input->getOption('module') ? $this->validateModuleName($input->getOption('module')) : null;
         } catch (\Exception $error) {
-            $output->writeln($dialog->getHelperSet()->get('formatter')->formatBlock($error->getMessage(), 'error'));
+            $output->writeln($dialog->getFormatterHelper()->formatBlock($error->getMessage(), 'error'));
         }
 
         $module = $input->getOption('module');
@@ -203,7 +211,7 @@ class GeneratorModuleCommand extends GeneratorCommand
         try {
             $machine_name = $input->getOption('machine-name') ? $this->validateModule($input->getOption('machine-name')) : null;
         } catch (\Exception $error) {
-            $output->writeln($dialog->getHelperSet()->get('formatter')->formatBlock($error->getMessage(), 'error'));
+            $output->writeln($dialog->getFormatterHelper()->formatBlock($error->getMessage(), 'error'));
         }
 
         if (!$machine_name) {
@@ -222,8 +230,8 @@ class GeneratorModuleCommand extends GeneratorCommand
         }
 
         $module_path = $input->getOption('module-path');
-        $drupalAutoLoad = $this->getHelperSet()->get('drupal-autoload');
-        $drupal_root = $drupalAutoLoad->getDrupalRoot();
+        $drupal = $this->getDrupalHelper();
+        $drupal_root = $drupal->getRoot();
 
         if (!$module_path) {
             $module_path_default = '/modules/custom';
@@ -284,6 +292,17 @@ class GeneratorModuleCommand extends GeneratorCommand
             );
         }
         $input->setOption('core', $core);
+
+        $feature = $input->getOption('feature');
+        if (!$feature && $dialog->askConfirmation(
+            $output,
+            $dialog->getQuestion($this->trans('commands.generate.module.questions.feature'), 'no', '?'),
+            false
+        )
+        ) {
+            $feature = true;
+        }
+        $input->setOption('feature', $feature);
 
         $composer = $input->getOption('composer');
         if (!$composer && $dialog->askConfirmation(

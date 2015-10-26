@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\Command\RestDebugCommand.
+ * Contains \Drupal\Console\Command\RestDebugCommand.
  */
 
-namespace Drupal\AppConsole\Command;
+namespace Drupal\Console\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -40,7 +40,7 @@ class RestDebugCommand extends ContainerAwareCommand
         $resource_id = $input->getArgument('resource-id');
         $status = $input->getOption('authorization');
 
-        $table = $this->getHelperSet()->get('table');
+        $table = $this->getTableHelper();
         $table->setlayout($table::LAYOUT_COMPACT);
 
         if ($resource_id) {

@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\Command\TestDebugCommand.
+ * Contains \Drupal\Console\Command\TestDebugCommand.
  */
 
-namespace Drupal\AppConsole\Command;
+namespace Drupal\Console\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -163,7 +163,7 @@ class TestRunCommand extends ContainerAwareCommand
                     }
                 }
 
-                $output->writeln('[-] <info>' . $this->trans('commands.test.run.messages.file') . ': ' . str_replace(DRUPAL_ROOT, '', $message->file) . '</info>');
+                $output->writeln('[-] <info>' . $this->trans('commands.test.run.messages.file') . ': ' . str_replace($this->getDrupalHelper()->getRoot(), '', $message->file) . '</info>');
                 $output->writeln('[-] <info>' . $this->trans('commands.test.run.messages.method') . ': ' . $message->function . '</info>');
                 $output->writeln('[-] <info>' . $this->trans('commands.test.run.messages.line') . ': ' . $message->line . '</info>');
                 $output->writeln('[-] <info>' . $this->trans('commands.test.run.messages.message') . ': ' . $message->message . '</info>');

@@ -2,20 +2,20 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\Command\GeneratorPluginRestResourceCommand.
+ * Contains \Drupal\Console\Command\GeneratorPluginRestResourceCommand.
  */
 
-namespace Drupal\AppConsole\Command;
+namespace Drupal\Console\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Drupal\AppConsole\Command\Helper\ServicesTrait;
-use Drupal\AppConsole\Command\Helper\ModuleTrait;
-use Drupal\AppConsole\Command\Helper\FormTrait;
+use Drupal\Console\Command\ServicesTrait;
+use Drupal\Console\Command\ModuleTrait;
+use Drupal\Console\Command\FormTrait;
 use Symfony\Component\Console\Question\ChoiceQuestion;
-use Drupal\AppConsole\Generator\PluginRestResourceGenerator;
-use Drupal\AppConsole\Command\Helper\ConfirmationTrait;
+use Drupal\Console\Generator\PluginRestResourceGenerator;
+use Drupal\Console\Command\ConfirmationTrait;
 
 class GeneratorPluginRestResourceCommand extends GeneratorCommand
 {
@@ -36,6 +36,12 @@ class GeneratorPluginRestResourceCommand extends GeneratorCommand
                 '',
                 InputOption::VALUE_OPTIONAL,
                 $this->trans('commands.generate.plugin.rest.resource.options.class-name')
+            )
+            ->addOption(
+                'name',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                $this->trans('commands.generate.service.options.name')
             )
             ->addOption(
                 'plugin-id',
@@ -70,7 +76,7 @@ class GeneratorPluginRestResourceCommand extends GeneratorCommand
     {
         $dialog = $this->getDialogHelper();
 
-        // @see use Drupal\AppConsole\Command\Helper\ConfirmationTrait::confirmationQuestion
+        // @see use Drupal\Console\Command\ConfirmationTrait::confirmationQuestion
         if ($this->confirmationQuestion($input, $output, $dialog)) {
             return;
         }
@@ -85,19 +91,19 @@ class GeneratorPluginRestResourceCommand extends GeneratorCommand
         $this->getGenerator()
             ->generate($module, $class_name, $plugin_label, $plugin_id, $plugin_url, $plugin_states);
 
-        $this->getHelper('chain')->addCommand('cache:rebuild', ['cache' => 'discovery']);
+        $this->getChain()->addCommand('cache:rebuild', ['cache' => 'discovery']);
     }
 
     protected function interact(InputInterface $input, OutputInterface $output)
     {
         $dialog = $this->getDialogHelper();
 
-        $stringUtils = $this->getStringUtils();
+        $stringUtils = $this->getStringHelper();
 
         // --module option
         $module = $input->getOption('module');
         if (!$module) {
-            // @see Drupal\AppConsole\Command\Helper\ModuleTrait::moduleQuestion
+            // @see Drupal\Console\Command\ModuleTrait::moduleQuestion
             $module = $this->moduleQuestion($output, $dialog);
         }
         $input->setOption('module', $module);
@@ -140,7 +146,7 @@ class GeneratorPluginRestResourceCommand extends GeneratorCommand
         }
         $input->setOption('plugin-id', $plugin_id);
 
-        $default_label = $this->getStringUtils()->camelCaseToHuman($class_name);
+        $default_label = $this->getStringHelper()->camelCaseToHuman($class_name);
 
         // --plugin-id option
         $plugin_label = $input->getOption('plugin-label');

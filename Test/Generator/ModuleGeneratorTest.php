@@ -1,17 +1,17 @@
 <?php
 /**
  * @file
- * Contains Drupal\AppConsole\Test\Generator\ModuleGeneratorTest.
+ * Contains Drupal\Console\Test\Generator\ModuleGeneratorTest.
  */
 
-namespace Drupal\AppConsole\Test\Generator;
+namespace Drupal\Console\Test\Generator;
 
-use Drupal\AppConsole\Generator\ModuleGenerator;
-use Drupal\AppConsole\Test\DataProvider\ModuleDataProviderTrait;
+use Drupal\Console\Generator\ModuleGenerator;
+use Drupal\Console\Test\DataProvider\ModuleDataProviderTrait;
 
 /**
  * Class ModuleGeneratorTest
- * @package Drupal\AppConsole\Test\Generator
+ * @package Drupal\Console\Test\Generator
  */
 class ModuleGeneratorTest extends GeneratorTest
 {
@@ -26,6 +26,7 @@ class ModuleGeneratorTest extends GeneratorTest
      * @param $description
      * @param $core
      * @param $package
+     * @param $feature
      * @param $composer
      * @param $dependencies
      *
@@ -38,12 +39,14 @@ class ModuleGeneratorTest extends GeneratorTest
         $description,
         $core,
         $package,
+        $feature,
         $composer,
         $dependencies
     ) {
         $generator = new ModuleGenerator();
-        $generator->setSkeletonDirs(__DIR__ . '/../../templates');
-        $generator->setHelpers($this->getHelperSet());
+        $this->getRenderHelper()->setSkeletonDirs($this->getSkeletonDirs());
+        $this->getRenderHelper()->setTranslator($this->getTranslatorHelper());
+        $generator->setHelperSet($this->getHelperSet());
 
         $generator->generate(
             $module,
@@ -52,6 +55,7 @@ class ModuleGeneratorTest extends GeneratorTest
             $description,
             $core,
             $package,
+            $feature,
             $composer,
             $dependencies
         );

@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\Command\TestDebugCommand.
+ * Contains \Drupal\Console\Command\TestDebugCommand.
  */
 
-namespace Drupal\AppConsole\Command;
+namespace Drupal\Console\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -49,7 +49,7 @@ class TestDebugCommand extends ContainerAwareCommand
         $test_class = $input->getArgument('test-class');
         $group = $input->getOption('group');
 
-        $table = $this->getHelperSet()->get('table');
+        $table = $this->getTableHelper();
         $table->setlayout($table::LAYOUT_COMPACT);
 
         if ($test_class) {

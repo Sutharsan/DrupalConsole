@@ -2,17 +2,17 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\Command\GeneratorPluginFieldTypeCommand.
+ * Contains \Drupal\Console\Command\GeneratorPluginFieldTypeCommand.
  */
 
-namespace Drupal\AppConsole\Command;
+namespace Drupal\Console\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Drupal\AppConsole\Generator\PluginFieldTypeGenerator;
-use Drupal\AppConsole\Command\Helper\ModuleTrait;
-use Drupal\AppConsole\Command\Helper\ConfirmationTrait;
+use Drupal\Console\Generator\PluginFieldTypeGenerator;
+use Drupal\Console\Command\ModuleTrait;
+use Drupal\Console\Command\ConfirmationTrait;
 
 class GeneratorPluginFieldTypeCommand extends GeneratorCommand
 {
@@ -71,7 +71,7 @@ class GeneratorPluginFieldTypeCommand extends GeneratorCommand
     {
         $dialog = $this->getDialogHelper();
 
-        // @see use Drupal\AppConsole\Command\Helper\ConfirmationTrait::confirmationQuestion
+        // @see use Drupal\Console\Command\ConfirmationTrait::confirmationQuestion
         if ($this->confirmationQuestion($input, $output, $dialog)) {
             return;
         }
@@ -89,7 +89,7 @@ class GeneratorPluginFieldTypeCommand extends GeneratorCommand
             ->generate($module, $class_name, $label, $plugin_id, $description, $default_widget, $default_formatter);
 
 
-        $this->getHelper('chain')->addCommand('cache:rebuild', ['cache' => 'discovery'], false);
+        $this->getChain()->addCommand('cache:rebuild', ['cache' => 'discovery'], false);
     }
 
     protected function interact(InputInterface $input, OutputInterface $output)
@@ -99,7 +99,7 @@ class GeneratorPluginFieldTypeCommand extends GeneratorCommand
         // --module option
         $module = $input->getOption('module');
         if (!$module) {
-            // @see Drupal\AppConsole\Command\Helper\ModuleTrait::moduleQuestion
+            // @see Drupal\Console\Command\ModuleTrait::moduleQuestion
             $module = $this->moduleQuestion($output, $dialog);
         }
         $input->setOption('module', $module);
@@ -118,7 +118,7 @@ class GeneratorPluginFieldTypeCommand extends GeneratorCommand
         }
         $input->setOption('class-name', $class_name);
 
-        $default_label = $this->getStringUtils()->camelCaseToHuman($class_name);
+        $default_label = $this->getStringHelper()->camelCaseToHuman($class_name);
 
         // --plugin label option
         $label = $input->getOption('label');
@@ -131,7 +131,7 @@ class GeneratorPluginFieldTypeCommand extends GeneratorCommand
         }
         $input->setOption('label', $label);
 
-        $machine_name = $this->getStringUtils()->camelCaseToUnderscore($class_name);
+        $machine_name = $this->getStringHelper()->camelCaseToUnderscore($class_name);
 
         // --name option
         $plugin_id = $input->getOption('plugin-id');

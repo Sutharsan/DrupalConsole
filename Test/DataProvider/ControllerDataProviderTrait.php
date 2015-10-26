@@ -1,10 +1,10 @@
 <?php
 
-namespace Drupal\AppConsole\Test\DataProvider;
+namespace Drupal\Console\Test\DataProvider;
 
 /**
- * Class ModuleDataProviderTrait
- * @package Drupal\AppConsole\Test\DataProvider
+ * Class ControllerDataProviderTrait
+ * @package Drupal\Console\Test\DataProvider
  */
 trait ControllerDataProviderTrait
 {
@@ -22,7 +22,6 @@ trait ControllerDataProviderTrait
         return [
           ['foo', 'FooController', $routes, true, null, 'foo_controller'],
           ['foo', 'FooController', $routes, false, null, 'foo_controller'],
-
         ];
     }
 }

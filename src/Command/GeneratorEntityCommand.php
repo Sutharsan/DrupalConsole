@@ -2,17 +2,17 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\Command\GeneratorEntityCommand.
+ * Contains \Drupal\Console\Command\GeneratorEntityCommand.
  */
 
-namespace Drupal\AppConsole\Command;
+namespace Drupal\Console\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Drupal\AppConsole\Command\Helper\ModuleTrait;
-use Drupal\AppConsole\Generator\EntityConfigGenerator;
-use Drupal\AppConsole\Generator\EntityContentGenerator;
+use Drupal\Console\Command\ModuleTrait;
+use Drupal\Console\Generator\EntityConfigGenerator;
+use Drupal\Console\Generator\EntityContentGenerator;
 
 abstract class GeneratorEntityCommand extends GeneratorCommand
 {
@@ -79,7 +79,7 @@ abstract class GeneratorEntityCommand extends GeneratorCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $entityType = $this->getStringUtils()->camelCaseToUnderscore($this->entityType);
+        $entityType = $this->getStringHelper()->camelCaseToUnderscore($this->entityType);
 
         $module = $input->getOption('module');
         $entity_class = $input->getOption('entity-class');
@@ -97,12 +97,12 @@ abstract class GeneratorEntityCommand extends GeneratorCommand
     protected function interact(InputInterface $input, OutputInterface $output)
     {
         $dialog = $this->getDialogHelper();
-        $utils = $this->getStringUtils();
+        $utils = $this->getStringHelper();
 
         // --module option
         $module = $input->getOption('module');
         if (!$module) {
-            // @see Drupal\AppConsole\Command\Helper\ModuleTrait::moduleQuestion
+            // @see Drupal\Console\Command\ModuleTrait::moduleQuestion
             $module = $this->moduleQuestion($output, $dialog);
         }
         $input->setOption('module', $module);

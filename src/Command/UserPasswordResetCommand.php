@@ -1,15 +1,15 @@
 <?php
 /**
  * @file
- * Contains \Drupal\AppConsole\Command\UserPasswordResetCommand.
+ * Contains \Drupal\Console\Command\UserPasswordResetCommand.
  */
 
-namespace Drupal\AppConsole\Command;
+namespace Drupal\Console\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
-use Drupal\AppConsole\Command\Helper\ConfirmationTrait;
+use Drupal\Console\Command\ConfirmationTrait;
 
 class UserPasswordResetCommand extends ContainerAwareCommand
 {
@@ -33,7 +33,7 @@ class UserPasswordResetCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $messageHelper = $this->getHelperSet()->get('message');
+        $messageHelper = $this->getMessageHelper();
         $uid = $input->getArgument('user');
 
         $user = \Drupal\user\Entity\User::load($uid);
@@ -61,7 +61,7 @@ class UserPasswordResetCommand extends ContainerAwareCommand
             $user->setPassword($password);
             $user->save();
             // Clear all failed login attempts after setup new password to user account.
-            $this->getHelper('chain')
+            $this->getChain()
                 ->addCommand('user:login:clear:attempts', ['uid' => $uid]);
         } catch (\Exception $e) {
             throw new \InvalidArgumentException($e->getMessage());

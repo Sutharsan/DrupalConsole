@@ -2,66 +2,31 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\Generator\Generator.
+ * Contains \Drupal\Console\Generator\Generator.
  */
 
-namespace Drupal\AppConsole\Generator;
+namespace Drupal\Console\Generator;
 
-use Drupal\AppConsole\Utils\StringUtils;
+use Drupal\Console\Helper\HelperTrait;
 
 class Generator
 {
-    private $skeletonDirs;
+    use HelperTrait;
 
-    private $translator;
-
+    /**
+     * @var array
+     */
     private $files;
 
+    /**
+     * @var bool
+     */
     private $learning = false;
 
-    private $helpers;
-
     /**
-     * Sets an array of directories to look for templates.
-     *
-     * The directories must be sorted from the most specific to the most
-     * directory.
-     *
-     * @param array $skeletonDirs An array of skeleton dirs
+     * @var array
      */
-    public function setSkeletonDirs($skeletonDirs)
-    {
-        $this->skeletonDirs = is_array($skeletonDirs) ? $skeletonDirs : array($skeletonDirs);
-    }
-
-    /**
-     * @param string $template
-     * @param array  $parameters
-     *
-     * @return string
-     */
-    protected function render($template, $parameters)
-    {
-        $twig = new \Twig_Environment(
-            new \Twig_Loader_Filesystem($this->skeletonDirs), [
-            'debug' => true,
-            'cache' => false,
-            'strict_variables' => true,
-            'autoescape' => false,
-            ]
-        );
-
-        $twig->addFunction($this->getServicesAsParameters());
-        $twig->addFunction($this->getServicesAsParametersKeys());
-        $twig->addFunction($this->getArgumentsFromRoute());
-        $twig->addFunction($this->getServicesClassInitialization());
-        $twig->addFunction($this->getServicesClassInjection());
-        $twig->addFunction($this->getTagsAsArray());
-        $twig->addFunction($this->getTranslationAsYamlComment());
-        $twig->addFilter($this->createMachineName());
-
-        return $twig->render($template, $parameters);
-    }
+    private $helperSet;
 
     /**
      * @param string $template
@@ -77,8 +42,8 @@ class Generator
             mkdir(dirname($target), 0777, true);
         }
 
-        if (file_put_contents($target, $this->render($template, $parameters), $flag)) {
-            $this->files[] = str_replace(DRUPAL_ROOT.'/', '', $target);
+        if (file_put_contents($target, $this->getRenderHelper()->render($template, $parameters), $flag)) {
+            $this->files[] = str_replace($this->getDrupalHelper()->getRoot().'/', '', $target);
 
             return true;
         }
@@ -87,207 +52,40 @@ class Generator
     }
 
     /**
-     * @param string $template
-     * @param array  $parameters
-     *
-     * @return string
+     * @param $helperSet
      */
-    protected function renderView($template, $parameters)
+    public function setHelperSet($helperSet)
     {
-        return $this->render($template, $parameters);
+        $this->helperSet = $helperSet;
     }
 
     /**
-     * @return \Twig_SimpleFunction
+     * @return array
      */
-    public function getServicesAsParameters()
+    public function getHelperSet()
     {
-        $servicesAsParameters = new \Twig_SimpleFunction(
-            'servicesAsParameters', function ($services) {
-                $returnValues = [];
-                foreach ($services as $service) {
-                    $returnValues[] = sprintf('%s $%s', $service['short'], $service['machine_name']);
-                }
-
-                return $returnValues;
-            }
-        );
-
-        return $servicesAsParameters;
+        return $this->helperSet;
     }
 
     /**
-     * @return \Twig_SimpleFunction
+     * @return array
      */
-    public function getServicesAsParametersKeys()
-    {
-        $servicesAsParametersKeys = new \Twig_SimpleFunction(
-            'servicesAsParametersKeys', function ($services) {
-                $returnValues = [];
-                foreach ($services as $service) {
-                    $returnValues[] = sprintf('"@%s"', $service['name']);
-                }
-
-                return $returnValues;
-            }
-        );
-
-        return $servicesAsParametersKeys;
-    }
-
-    /**
-     * @return \Twig_SimpleFunction
-     */
-    public function getArgumentsFromRoute()
-    {
-        $argumentsFromRoute = new \Twig_SimpleFunction(
-            'argumentsFromRoute', function ($route) {
-                $returnValues = '';
-                preg_match_all('/{(.*?)}/', $route, $returnValues);
-
-                $returnValues = array_map(
-                    function ($value) {
-                        return sprintf('$%s', $value);
-                    }, $returnValues[1]
-                );
-
-                return $returnValues;
-            }
-        );
-
-        return $argumentsFromRoute;
-    }
-
-    /**
-     * @return \Twig_SimpleFunction
-     */
-    public function getServicesClassInitialization()
-    {
-        $returnValue = new \Twig_SimpleFunction(
-            'serviceClassInitialization', function ($services) {
-                $returnValues = [];
-                foreach ($services as $service) {
-                    $returnValues[] = sprintf('    $this->%s = $%s;', $service['machine_name'], $service['machine_name']);
-                }
-
-                return implode(PHP_EOL, $returnValues);
-            }
-        );
-
-        return $returnValue;
-    }
-
-    /**
-     * @return \Twig_SimpleFunction
-     */
-    public function getServicesClassInjection()
-    {
-        $returnValue = new \Twig_SimpleFunction(
-            'serviceClassInjection', function ($services) {
-                $returnValues = [];
-                foreach ($services as $service) {
-                    $returnValues[] = sprintf('      $container->get(\'%s\')', $service['name']);
-                }
-
-                return implode(','.PHP_EOL, $returnValues);
-            }
-        );
-
-        return $returnValue;
-    }
-
-    /**
-     * @return \Twig_SimpleFunction
-     */
-    public function getTagsAsArray()
-    {
-        $returnValue = new \Twig_SimpleFunction(
-            'tagsAsArray', function ($tags) {
-                $returnValues = [];
-                foreach ($tags as $key => $value) {
-                    $returnValues[] = sprintf('%s: %s', $key, $value);
-                }
-
-                return $returnValues;
-            }
-        );
-
-        return $returnValue;
-    }
-
-    public function getTranslationAsYamlComment()
-    {
-        $returnValue = new \Twig_SimpleFunction(
-            'yaml_comment', function (\Twig_Environment $environment, $context, $key) {
-                $message = $this->translator->trans($key);
-                $messages = explode("\n", $message);
-                $returnValues = [];
-                foreach ($messages as $message) {
-                    $returnValues[] = '# '.$message;
-                }
-
-                $message = implode("\n", $returnValues);
-                $environment->setLoader(new \Twig_Loader_String());
-
-                return $environment->render($message, $context);
-            }, [
-            'needs_environment' => true,
-            'needs_context' => true,
-            ]
-        );
-
-        return $returnValue;
-    }
-
-    /**
-     * @return \Twig_SimpleFilter
-     */
-    public function createMachineName()
-    {
-        $string = new StringUtils();
-
-        return new \Twig_SimpleFilter(
-            'machine_name', function ($var) use ($string) {
-                return $string->createMachineName($var);
-            }
-        );
-    }
-
-    public function getSite()
-    {
-        return $this->getHelpers()->get('site');
-    }
-
-    public function setHelpers($helpers)
-    {
-        $this->helpers = $helpers;
-    }
-
-    public function getHelpers()
-    {
-        return $this->helpers;
-    }
-
-    public function setTranslator($translator)
-    {
-        $this->translator = $translator;
-    }
-
-    public function getTranslator()
-    {
-        return $this->translator;
-    }
-
     public function getFiles()
     {
         return $this->files;
     }
 
+    /**
+     * @param $learning
+     */
     public function setLearning($learning)
     {
         $this->learning = $learning;
     }
 
+    /**
+     * @return bool
+     */
     public function isLearning()
     {
         return $this->learning;

@@ -1,28 +1,33 @@
 <?php
 
-use Drupal\AppConsole\Console\Shell;
-use Drupal\AppConsole\Console\Application;
-use Drupal\AppConsole\Command\Helper\ShellHelper;
-use Drupal\AppConsole\Command\Helper\KernelHelper;
-use Drupal\AppConsole\Command\Helper\DialogHelper;
-use Drupal\AppConsole\Command\Helper\RegisterCommandsHelper;
-use Drupal\AppConsole\Utils\StringUtils;
-use Drupal\AppConsole\Utils\Validators;
-use Drupal\AppConsole\Command\Helper\TranslatorHelper;
+use Drupal\Console\Shell;
+use Drupal\Console\Application;
+use Drupal\Console\Helper\ShellHelper;
+use Drupal\Console\Helper\KernelHelper;
+use Drupal\Console\Helper\DialogHelper;
+use Drupal\Console\Helper\StringHelper;
+use Drupal\Console\Helper\ValidatorHelper;
+use Drupal\Console\Helper\TranslatorHelper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Drupal\AppConsole\UserConfig;
-use Drupal\AppConsole\Command\Helper\DrupalAutoloadHelper;
-use Drupal\AppConsole\Command\Helper\SiteHelper;
-use Drupal\AppConsole\EventSubscriber\ShowGeneratedFilesListener;
-use Drupal\AppConsole\EventSubscriber\ShowWelcomeMessageListener;
-use Drupal\AppConsole\Command\Helper\MessageHelper;
-use Drupal\AppConsole\Command\Helper\ChainCommandHelper;
-use Drupal\AppConsole\EventSubscriber\CallCommandListener;
-use Drupal\AppConsole\EventSubscriber\ShowGenerateChainListener;
-use Drupal\AppConsole\EventSubscriber\ShowGenerateInlineListener;
-use Drupal\AppConsole\EventSubscriber\ShowCompletedMessageListener;
-use Drupal\AppConsole\EventSubscriber\ValidateDependenciesListener;
-use Drupal\AppConsole\EventSubscriber\DefaultValueEventListener;
+use Drupal\Console\Config;
+use Drupal\Console\Helper\SiteHelper;
+use Drupal\Console\EventSubscriber\ShowGeneratedFilesListener;
+use Drupal\Console\EventSubscriber\ShowWelcomeMessageListener;
+use Drupal\Console\Helper\MessageHelper;
+use Drupal\Console\Helper\ChainCommandHelper;
+use Drupal\Console\EventSubscriber\CallCommandListener;
+use Drupal\Console\EventSubscriber\ShowGenerateChainListener;
+use Drupal\Console\EventSubscriber\ShowGenerateInlineListener;
+use Drupal\Console\EventSubscriber\ShowTerminateMessageListener;
+use Drupal\Console\EventSubscriber\ValidateDependenciesListener;
+use Drupal\Console\EventSubscriber\DefaultValueEventListener;
+use Drupal\Console\Helper\NestedArrayHelper;
+use Drupal\Console\Helper\TwigRendererHelper;
+use Drupal\Console\EventSubscriber\ShowGenerateDocListener;
+use Drupal\Console\Helper\DrupalHelper;
+use Drupal\Console\Helper\CommandDiscoveryHelper;
+use Drupal\Console\Helper\RemoteHelper;
+use Drupal\Console\Helper\HttpClientHelper;
 
 set_time_limit(0);
 
@@ -38,7 +43,7 @@ if (file_exists($consoleRoot.'/vendor/autoload.php')) {
     exit(1);
 }
 
-$config = new UserConfig();
+$config = new Config();
 
 $translatorHelper = new TranslatorHelper();
 $translatorHelper->loadResource($config->get('application.language'), $consoleRoot);
@@ -47,17 +52,21 @@ $application = new Application($config, $translatorHelper);
 $application->setDirectoryRoot($consoleRoot);
 
 $helpers = [
+    'nested-array' => new NestedArrayHelper(),
     'kernel' => new KernelHelper(),
     'shell' => new ShellHelper(new Shell($application)),
     'dialog' => new DialogHelper(),
-    'register_commands' => new RegisterCommandsHelper($application),
-    'stringUtils' => new StringUtils(),
-    'validators' => new Validators(),
+    'string' => new StringHelper(),
+    'validator' => new ValidatorHelper(),
     'translator' => $translatorHelper,
-    'drupal-autoload' => new DrupalAutoloadHelper(),
     'site' => new SiteHelper(),
-    'message' => new MessageHelper($translatorHelper),
+    'renderer' => new TwigRendererHelper(),
+    'message' => new MessageHelper(),
     'chain' => new ChainCommandHelper(),
+    'drupal' => new DrupalHelper(),
+    'commandDiscovery' => new CommandDiscoveryHelper(),
+    'remote' => new RemoteHelper(),
+    'httpClient' => new HttpClientHelper(),
 ];
 
 $application->addHelpers($helpers);
@@ -65,13 +74,14 @@ $application->addHelpers($helpers);
 $dispatcher = new EventDispatcher();
 $dispatcher->addSubscriber(new ValidateDependenciesListener());
 $dispatcher->addSubscriber(new ShowWelcomeMessageListener());
+$dispatcher->addSubscriber(new ShowGenerateDocListener());
 $dispatcher->addSubscriber(new DefaultValueEventListener());
 $dispatcher->addSubscriber(new ShowGeneratedFilesListener());
 $dispatcher->addSubscriber(new CallCommandListener());
 $dispatcher->addSubscriber(new ShowGenerateChainListener());
 $dispatcher->addSubscriber(new ShowGenerateInlineListener());
-$dispatcher->addSubscriber(new ShowCompletedMessageListener());
+$dispatcher->addSubscriber(new ShowTerminateMessageListener());
 
 $application->setDispatcher($dispatcher);
-$application->setDefaultCommand('list');
+$application->setDefaultCommand('about');
 $application->run();

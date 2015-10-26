@@ -1,14 +1,14 @@
 <?php
 /**
  * @file
- * Contains \Drupal\AppConsole\Test\Command\GeneratorModuleCommandTest.
+ * Contains \Drupal\Console\Test\Command\GeneratorModuleCommandTest.
  */
 
-namespace Drupal\AppConsole\Test\Command;
+namespace Drupal\Console\Test\Command;
 
-use Drupal\AppConsole\Command\GeneratorModuleCommand;
+use Drupal\Console\Command\GeneratorModuleCommand;
 use Symfony\Component\Console\Tester\CommandTester;
-use Drupal\AppConsole\Test\DataProvider\ModuleDataProviderTrait;
+use Drupal\Console\Test\DataProvider\ModuleDataProviderTrait;
 
 class GeneratorModuleCommandTest extends GenerateCommandTest
 {
@@ -23,6 +23,7 @@ class GeneratorModuleCommandTest extends GenerateCommandTest
      * @param $description
      * @param $core
      * @param $package
+     * @param $feature
      * @param $composer
      * @param $dependencies
      *
@@ -35,11 +36,11 @@ class GeneratorModuleCommandTest extends GenerateCommandTest
         $description,
         $core,
         $package,
+        $feature,
         $composer,
         $dependencies
     ) {
-        $command = new GeneratorModuleCommand($this->getTranslatorHelper());
-        $command->setContainer($this->getContainer());
+        $command = new GeneratorModuleCommand($this->getHelperSet());
         $command->setHelperSet($this->getHelperSet());
         $command->setGenerator($this->getGenerator());
 
@@ -53,6 +54,7 @@ class GeneratorModuleCommandTest extends GenerateCommandTest
               '--description'    => $description,
               '--core'           => $core,
               '--package'        => $package,
+              '--feature'        => $feature,
               '--composer'       => $composer,
               '--dependencies'   => $dependencies
             ],
@@ -65,9 +67,9 @@ class GeneratorModuleCommandTest extends GenerateCommandTest
     private function getGenerator()
     {
         return $this
-          ->getMockBuilder('Drupal\AppConsole\Generator\ModuleGenerator')
-          ->disableOriginalConstructor()
-          ->setMethods(['generate'])
-          ->getMock();
+            ->getMockBuilder('Drupal\Console\Generator\ModuleGenerator')
+            ->disableOriginalConstructor()
+            ->setMethods(['generate'])
+            ->getMock();
     }
 }

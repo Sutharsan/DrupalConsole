@@ -2,19 +2,19 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\Command\GeneratorPluginBlockCommand.
+ * Contains \Drupal\Console\Command\GeneratorPluginBlockCommand.
  */
 
-namespace Drupal\AppConsole\Command;
+namespace Drupal\Console\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Drupal\AppConsole\Generator\PluginBlockGenerator;
-use Drupal\AppConsole\Command\Helper\ServicesTrait;
-use Drupal\AppConsole\Command\Helper\ModuleTrait;
-use Drupal\AppConsole\Command\Helper\FormTrait;
-use Drupal\AppConsole\Command\Helper\ConfirmationTrait;
+use Drupal\Console\Generator\PluginBlockGenerator;
+use Drupal\Console\Command\ServicesTrait;
+use Drupal\Console\Command\ModuleTrait;
+use Drupal\Console\Command\FormTrait;
+use Drupal\Console\Command\ConfirmationTrait;
 
 class GeneratorPluginBlockCommand extends GeneratorCommand
 {
@@ -64,7 +64,7 @@ class GeneratorPluginBlockCommand extends GeneratorCommand
     {
         $dialog = $this->getDialogHelper();
 
-        // @see use Drupal\AppConsole\Command\Helper\ConfirmationTrait::confirmationQuestion
+        // @see use Drupal\Console\Command\ConfirmationTrait::confirmationQuestion
         if ($this->confirmationQuestion($input, $output, $dialog)) {
             return;
         }
@@ -76,14 +76,14 @@ class GeneratorPluginBlockCommand extends GeneratorCommand
         $services = $input->getOption('services');
         $inputs = $input->getOption('inputs');
 
-        // @see use Drupal\AppConsole\Command\Helper\ServicesTrait::buildServices
+        // @see use Drupal\Console\Command\ServicesTrait::buildServices
         $build_services = $this->buildServices($services);
 
         $this
             ->getGenerator()
             ->generate($module, $class_name, $label, $plugin_id, $build_services, $inputs);
 
-        $this->getHelper('chain')->addCommand('cache:rebuild', ['cache' => 'discovery']);
+        $this->getChain()->addCommand('cache:rebuild', ['cache' => 'discovery']);
     }
 
     protected function interact(InputInterface $input, OutputInterface $output)
@@ -93,7 +93,7 @@ class GeneratorPluginBlockCommand extends GeneratorCommand
         // --module option
         $module = $input->getOption('module');
         if (!$module) {
-            // @see Drupal\AppConsole\Command\Helper\ModuleTrait::moduleQuestion
+            // @see Drupal\Console\Command\ModuleTrait::moduleQuestion
             $module = $this->moduleQuestion($output, $dialog);
         }
         $input->setOption('module', $module);
@@ -114,7 +114,7 @@ class GeneratorPluginBlockCommand extends GeneratorCommand
         }
         $input->setOption('class-name', $class_name);
 
-        $default_label = $this->getStringUtils()->camelCaseToHuman($class_name);
+        $default_label = $this->getStringHelper()->camelCaseToHuman($class_name);
 
         // --label option
         $label = $input->getOption('label');
@@ -127,7 +127,7 @@ class GeneratorPluginBlockCommand extends GeneratorCommand
         }
         $input->setOption('label', $label);
 
-        $machine_name = $this->getStringUtils()->camelCaseToUnderscore($class_name);
+        $machine_name = $this->getStringHelper()->camelCaseToUnderscore($class_name);
 
         // --plugin-id option
         $plugin_id = $input->getOption('plugin-id');
@@ -141,13 +141,13 @@ class GeneratorPluginBlockCommand extends GeneratorCommand
         $input->setOption('plugin-id', $plugin_id);
 
         // --services option
-        // @see Drupal\AppConsole\Command\Helper\ServicesTrait::servicesQuestion
+        // @see Drupal\Console\Command\ServicesTrait::servicesQuestion
         $services_collection = $this->servicesQuestion($output, $dialog);
         $input->setOption('services', $services_collection);
 
         $output->writeln($this->trans('commands.generate.plugin.block.messages.inputs'));
 
-        // @see Drupal\AppConsole\Command\Helper\FormTrait::formQuestion
+        // @see Drupal\Console\Command\FormTrait::formQuestion
         $form = $this->formQuestion($output, $dialog);
         $input->setOption('inputs', $form);
     }

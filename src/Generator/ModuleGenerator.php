@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\Generator\ModuleGenerator.
+ * Contains \Drupal\Console\Generator\ModuleGenerator.
  */
 
-namespace Drupal\AppConsole\Generator;
+namespace Drupal\Console\Generator;
 
 class ModuleGenerator extends Generator
 {
@@ -16,6 +16,7 @@ class ModuleGenerator extends Generator
         $description,
         $core,
         $package,
+        $feature,
         $composer,
         $dependencies
     ) {
@@ -55,6 +56,7 @@ class ModuleGenerator extends Generator
           'core' => $core,
           'description' => $description,
           'package' => $package,
+          'feature' => $feature,
           'dependencies' => $dependencies,
         );
 

@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\EventSubscriber\DefaultValueEventListener.
+ * Contains \Drupal\Console\EventSubscriber\DefaultValueEventListener.
  */
 
-namespace Drupal\AppConsole\EventSubscriber;
+namespace Drupal\Console\EventSubscriber;
 
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -25,16 +25,10 @@ class DefaultValueEventListener implements EventSubscriberInterface
     public function setDefaultValues(ConsoleCommandEvent $event)
     {
         /**
-         * @var \Drupal\AppConsole\Command\Command $command
+         * @var \Drupal\Console\Command\Command $command
          */
         $command = $event->getCommand();
-        /**
-         * @var \Drupal\AppConsole\Console\Application $command
-         */
         $application = $command->getApplication();
-        /**
-         * @var \Drupal\AppConsole\Config $config
-         */
         $config = $application->getConfig();
 
         if (in_array($command->getName(), $this->skipCommands)) {
@@ -44,7 +38,11 @@ class DefaultValueEventListener implements EventSubscriberInterface
         $input = $command->getDefinition();
         $options = $input->getOptions();
         foreach ($options as $key => $option) {
-            $defaultOption = 'commands.' . str_replace(':', '.', $command->getName()) . '.options.' . $key;
+            $defaultOption = sprintf(
+                'application.default.commands.%s.options.%s',
+                str_replace(':', '.', $command->getName()),
+                $key
+            );
             $defaultValue = $config->get($defaultOption);
             if ($defaultValue) {
                 $option->setDefault($defaultValue);
@@ -53,7 +51,11 @@ class DefaultValueEventListener implements EventSubscriberInterface
 
         $arguments = $input->getArguments();
         foreach ($arguments as $key => $argument) {
-            $defaultArgument = 'commands.' . str_replace(':', '.', $command->getName()) . '.arguments.' . $key;
+            $defaultArgument = sprintf(
+                'application.default.commands.%s.arguments.%s',
+                str_replace(':', '.', $command->getName()),
+                $key
+            );
             $defaultValue = $config->get($defaultArgument);
             if ($defaultValue) {
                 $argument->setDefault($defaultValue);

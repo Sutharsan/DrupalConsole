@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\Command\ContainerDebugCommand.
+ * Contains \Drupal\Console\Command\ContainerDebugCommand.
  */
 
-namespace Drupal\AppConsole\Command;
+namespace Drupal\Console\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,7 +22,7 @@ class ContainerDebugCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $services = $this->getServices();
-        $table = $this->getHelperSet()->get('table');
+        $table = $this->getTableHelper();
         $table->setHeaders(
             [
             $this->trans('commands.container.debug.messages.service_id'),

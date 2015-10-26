@@ -2,19 +2,19 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\Command\GeneratorPluginTypeAnnotationCommand.
+ * Contains \Drupal\Console\Command\GeneratorPluginTypeAnnotationCommand.
  */
 
-namespace Drupal\AppConsole\Command;
+namespace Drupal\Console\Command;
 
-use Drupal\AppConsole\Generator\PluginTypeAnnotationGenerator;
+use Drupal\Console\Generator\PluginTypeAnnotationGenerator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Drupal\AppConsole\Command\Helper\ServicesTrait;
-use Drupal\AppConsole\Command\Helper\ModuleTrait;
-use Drupal\AppConsole\Command\Helper\FormTrait;
-use Drupal\AppConsole\Command\Helper\ConfirmationTrait;
+use Drupal\Console\Command\ServicesTrait;
+use Drupal\Console\Command\ModuleTrait;
+use Drupal\Console\Command\FormTrait;
+use Drupal\Console\Command\ConfirmationTrait;
 
 class GeneratorPluginTypeAnnotationCommand extends GeneratorCommand
 {
@@ -71,7 +71,7 @@ class GeneratorPluginTypeAnnotationCommand extends GeneratorCommand
         // --module option
         $module = $input->getOption('module');
         if (!$module) {
-            // @see Drupal\AppConsole\Command\Helper\ModuleTrait::moduleQuestion
+            // @see Drupal\Console\Command\ModuleTrait::moduleQuestion
             $module = $this->moduleQuestion($output, $dialog);
         }
         $input->setOption('module', $module);
@@ -90,7 +90,7 @@ class GeneratorPluginTypeAnnotationCommand extends GeneratorCommand
         }
         $input->setOption('class-name', $class_name);
 
-        $default_machine_name = $this->getStringUtils()->camelCaseToUnderscore($class_name);
+        $default_machine_name = $this->getStringHelper()->camelCaseToUnderscore($class_name);
 
         // --machine-name option
         $machine_name = $input->getOption('machine-name');
@@ -106,7 +106,7 @@ class GeneratorPluginTypeAnnotationCommand extends GeneratorCommand
         }
         $input->setOption('machine-name', $machine_name);
 
-        $default_label = $this->getStringUtils()->camelCaseToHuman($class_name);
+        $default_label = $this->getStringHelper()->camelCaseToHuman($class_name);
 
         // --label option
         $label = $input->getOption('label');

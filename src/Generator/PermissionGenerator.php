@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains Drupal\AppConsole\Generator\PermissionGenerator.
+ * Contains Drupal\Console\Generator\PermissionGenerator.
  */
 
-namespace Drupal\AppConsole\Generator;
+namespace Drupal\Console\Generator;
 
 class PermissionGenerator extends Generator
 {
@@ -27,7 +27,7 @@ class PermissionGenerator extends Generator
             FILE_APPEND
         );
 
-        $content = $this->renderView(
+        $content = $this->getRenderHelper()->render(
             'module/permission-routing.yml.twig',
             $parameters
         );

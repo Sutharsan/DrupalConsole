@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\Command\MigrateLoadCommand.
+ * Contains \Drupal\Console\Command\MigrateLoadCommand.
  */
 
-namespace Drupal\AppConsole\Command;
+namespace Drupal\Console\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -99,7 +99,7 @@ class MigrateLoadCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $message = $this->getHelperSet()->get('message');
+        $message = $this->getMessageHelper();
 
         $file = null;
         if ($input->hasArgument('file')) {

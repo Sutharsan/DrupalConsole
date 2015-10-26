@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\Command\MigrateDebugCommand.
+ * Contains \Drupal\Console\Command\MigrateDebugCommand.
  */
 
-namespace Drupal\AppConsole\Command;
+namespace Drupal\Console\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -36,7 +36,7 @@ class YamlMergeCommand extends Command
     {
         $yaml = new Parser();
         $dumper = new Dumper();
-        $messageHelper = $this->getHelperSet()->get('message');
+        $messageHelper = $this->getMessageHelper();
 
         $final_yaml = array();
         $yaml_destination = $input->getArgument('yaml-destination');

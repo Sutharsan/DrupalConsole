@@ -2,12 +2,12 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\EventSubscriber\ShowGeneratedFiles.
+ * Contains \Drupal\Console\EventSubscriber\ShowGenerateInlineListener.
  */
 
-namespace Drupal\AppConsole\EventSubscriber;
+namespace Drupal\Console\EventSubscriber;
 
-use Drupal\AppConsole\Command\Helper\TranslatorHelper;
+use Drupal\Console\Helper\TranslatorHelper;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -32,7 +32,7 @@ class ShowGenerateInlineListener implements EventSubscriberInterface
     public function showGenerateInline(ConsoleTerminateEvent $event)
     {
         /**
-         * @var \Drupal\AppConsole\Command\Command $command
+         * @var \Drupal\Console\Command\Command $command
          */
         $command = $event->getCommand();
         $output = $event->getOutput();
@@ -41,11 +41,9 @@ class ShowGenerateInlineListener implements EventSubscriberInterface
         $this->skipArguments[] = $command_name;
 
         $application = $command->getApplication();
-        $messageHelper = $application->getHelperSet()->get('message');
-        /**
-         * @var TranslatorHelper
-         */
-        $translatorHelper = $application->getHelperSet()->get('translator');
+        $messageHelper = $application->getMessageHelper();
+        $translatorHelper = $application->getTranslator();
+
         if ($event->getExitCode() != 0) {
             return;
         }
@@ -93,7 +91,10 @@ class ShowGenerateInlineListener implements EventSubscriberInterface
 
 
             // Print yaml output and message
-            $messageHelper->showMessage($output, $translatorHelper->trans('application.console.messages.inline.generated'));
+            $messageHelper->showMessage(
+                $output,
+                $translatorHelper->trans('application.console.messages.inline.generated')
+            );
 
             $output->writeln('$ drupal' . $inline);
         }

@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\Command\SiteModeCommand.
+ * Contains \Drupal\Console\Command\SiteModeCommand.
  */
 
-namespace Drupal\AppConsole\Command;
+namespace Drupal\Console\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -56,7 +56,7 @@ class SiteMaintenanceCommand extends ContainerAwareCommand
         );
 
         if ($cacheRebuild) {
-            $this->getHelper('chain')->addCommand('cache:rebuild', ['cache' => 'all']);
+            $this->getChain()->addCommand('cache:rebuild', ['cache' => 'all']);
         }
     }
 }

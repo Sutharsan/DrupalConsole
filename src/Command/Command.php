@@ -1,41 +1,36 @@
 <?php
 
-namespace Drupal\AppConsole\Command;
+namespace Drupal\Console\Command;
 
 use Symfony\Component\Console\Command\Command as BaseCommand;
+use Symfony\Component\Console\Helper\HelperSet;
+use Drupal\Console\Helper\HelperTrait;
 
+/**
+ * Class Command
+ * @package Drupal\Console\Command
+ */
 abstract class Command extends BaseCommand
 {
+    use HelperTrait;
+
     /**
      * @var string
      */
     protected $module;
+
+    /**
+     * @var array
+     */
     protected $dependencies;
-    /**
-     * @var TranslatorHelper
-     */
-    protected $translator;
 
-    public function __construct($translator)
+    /**
+     * @param HelperSet $helperSet
+     */
+    public function __construct(HelperSet $helperSet)
     {
-        $this->translator = $translator;
+        $this->setHelperSet($helperSet);
         parent::__construct();
-    }
-
-    /**
-     * @return TranslatorHelper
-     */
-    public function getTranslator()
-    {
-        return $this->translator;
-    }
-
-    /**
-     * @param TranslatorHelper $translator
-     */
-    public function setTranslator($translator)
-    {
-        $this->translator = $translator;
     }
 
     /**
@@ -61,55 +56,32 @@ abstract class Command extends BaseCommand
      */
     public function trans($key)
     {
-        return $this->translator->trans($key);
+        return $this->getTranslator()->trans($key);
     }
 
     /**
-     * @return \Drupal\AppConsole\Utils\StringUtils
+     * @param $moduleName string
+     *
+     * @param $moduleName
      */
-    public function getStringUtils()
-    {
-        $stringUtils = $this->getHelperSet()->get('stringUtils');
-
-        return $stringUtils;
-    }
-
-    /**
-     * @return \Drupal\AppConsole\Utils\Validators
-     */
-    public function getValidator()
-    {
-        $validators = $this->getHelperSet()->get('validators');
-
-        return $validators;
-    }
-
     public function addDependency($moduleName)
     {
         $this->dependencies[] = $moduleName;
     }
 
+    /**
+     * @return array
+     */
     public function getDependencies()
     {
         return $this->dependencies;
     }
 
-    protected function getDialogHelper()
+    /**
+     * @return \Drupal\Console\Application;
+     */
+    public function getApplication()
     {
-        $dialog = $this->getHelperSet()->get('dialog');
-
-        return $dialog;
-    }
-
-    protected function getQuestionHelper()
-    {
-        $question = $this->getHelperSet()->get('question');
-
-        return $question;
-    }
-
-    public function getSite()
-    {
-        return $this->getHelperSet()->get('site');
+        return parent::getApplication();
     }
 }

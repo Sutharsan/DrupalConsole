@@ -2,12 +2,12 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\Command\ChainCommand.
+ * Contains \Drupal\Console\Command\ChainCommand.
  */
 
-namespace Drupal\AppConsole\Command;
+namespace Drupal\Console\Command;
 
-use Drupal\AppConsole\Config;
+use Drupal\Console\Config;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -35,7 +35,7 @@ class ChainCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $message = $this->getHelperSet()->get('message');
+        $message = $this->getMessageHelper();
 
         $interactive = false;
 
@@ -73,8 +73,10 @@ class ChainCommand extends ContainerAwareCommand
             return 1;
         }
 
-        $chainData = new Config($file);
-        $commands = $chainData->get('commands');
+        $configData = $this->getApplication()->getConfig()->getFileContents($file);
+        if (array_key_exists('commands', $configData)) {
+            $commands = $configData['commands'];
+        }
 
         foreach ($commands as $command) {
             $moduleInputs = [];
@@ -89,7 +91,7 @@ class ChainCommand extends ContainerAwareCommand
                 $moduleInputs['--'.$key] = is_null($value) ? '' : $value;
             }
 
-            $this->getHelper('chain')
+            $this->getChain()
                 ->addCommand($command['command'], $moduleInputs, $interactive, $learning);
         }
     }

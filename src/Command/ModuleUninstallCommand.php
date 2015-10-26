@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\Command\ModuleUninstallCommand.
+ * Contains \Drupal\Console\Command\ModuleUninstallCommand.
  */
 
-namespace Drupal\AppConsole\Command;
+namespace Drupal\Console\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -97,5 +97,8 @@ class ModuleUninstallCommand extends ContainerAwareCommand
 
             return;
         }
+
+        // Run cache rebuild to see changes in Web UI
+        $this->getChain()->addCommand('cache:rebuild', ['cache' => 'discovery']);
     }
 }

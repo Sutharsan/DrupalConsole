@@ -2,13 +2,13 @@
 
 /**
  * @file
- * Contains \Drupal\AppConsole\Test\Generator\CommandGeneratorTest.
+ * Contains \Drupal\Console\Test\Generator\CommandGeneratorTest.
  */
 
-namespace Drupal\AppConsole\Test\Generator;
+namespace Drupal\Console\Test\Generator;
 
-use Drupal\AppConsole\Generator\CommandGenerator;
-use Drupal\AppConsole\Test\DataProvider\CommandDataProviderTrait;
+use Drupal\Console\Generator\CommandGenerator;
+use Drupal\Console\Test\DataProvider\CommandDataProviderTrait;
 
 class CommandGeneratorTest extends GeneratorTest
 {
@@ -16,27 +16,28 @@ class CommandGeneratorTest extends GeneratorTest
 
     /**
      * @param $module
-     * @param $command
-     * @param $class_name
-     * @param $container
+     * @param $name
+     * @param $class
+     * @param $containerAware
      *
      * @dataProvider commandData
      */
-    public function testCommandController(
+    public function testGenerateCommand(
         $module,
-        $command,
-        $class_name,
-        $container
+        $name,
+        $class,
+        $containerAware
     ) {
         $generator = new CommandGenerator();
-        $generator->setSkeletonDirs(__DIR__ . '/../../templates');
-        $generator->setHelpers($this->getHelperSet());
+        $this->getRenderHelper()->setSkeletonDirs($this->getSkeletonDirs());
+        $this->getRenderHelper()->setTranslator($this->getTranslatorHelper());
+        $generator->setHelperSet($this->getHelperSet());
 
         $generator->generate(
             $module,
-            $command,
-            $class_name,
-            $container
+            $name,
+            $class,
+            $containerAware
         );
     }
 }

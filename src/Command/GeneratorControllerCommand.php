@@ -2,18 +2,18 @@
 
 /**
  * @file
- * Contains Drupal\AppConsole\Command\GeneratorControllerCommand.
+ * Contains Drupal\Console\Command\GeneratorControllerCommand.
  */
 
-namespace Drupal\AppConsole\Command;
+namespace Drupal\Console\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Drupal\AppConsole\Command\Helper\ServicesTrait;
-use Drupal\AppConsole\Command\Helper\ConfirmationTrait;
-use Drupal\AppConsole\Command\Helper\ModuleTrait;
-use Drupal\AppConsole\Generator\ControllerGenerator;
+use Drupal\Console\Command\ServicesTrait;
+use Drupal\Console\Command\ConfirmationTrait;
+use Drupal\Console\Command\ModuleTrait;
+use Drupal\Console\Generator\ControllerGenerator;
 
 class GeneratorControllerCommand extends GeneratorCommand
 {
@@ -91,17 +91,17 @@ class GeneratorControllerCommand extends GeneratorCommand
             $learning = $input->getOption('learning');
         }
 
-        // @see use Drupal\AppConsole\Command\Helper\ServicesTrait::buildServices
+        // @see use Drupal\Console\Command\ServicesTrait::buildServices
         $build_services = $this->buildServices($services);
 
         // Controller machine name
-        $class_machine_name = $this->getStringUtils()->camelCaseToMachineName($class_name);
+        $class_machine_name = $this->getStringHelper()->camelCaseToMachineName($class_name);
 
         $generator = $this->getGenerator();
         $generator->setLearning($learning);
         $generator->generate($module, $class_name, $routes, $test, $build_services, $class_machine_name);
 
-        $this->getHelper('chain')->addCommand('router:rebuild');
+        $this->getChain()->addCommand('router:rebuild');
     }
 
     /**
@@ -114,7 +114,7 @@ class GeneratorControllerCommand extends GeneratorCommand
         // --module option
         $module = $input->getOption('module');
         if (!$module) {
-            // @see Drupal\AppConsole\Command\Helper\ModuleTrait::moduleQuestion
+            // @see Drupal\Console\Command\ModuleTrait::moduleQuestion
             $module = $this->moduleQuestion($output, $dialog);
         }
         $input->setOption('module', $module);
@@ -243,13 +243,13 @@ class GeneratorControllerCommand extends GeneratorCommand
         $input->setOption('test', $test);
 
         // --services option
-        // @see use Drupal\AppConsole\Command\Helper\ServicesTrait::servicesQuestion
+        // @see use Drupal\Console\Command\ServicesTrait::servicesQuestion
         $services_collection = $this->servicesQuestion($output, $dialog);
         $input->setOption('services', $services_collection);
     }
 
     /**
-     * @return \Drupal\AppConsole\Generator\ControllerGenerator
+     * @return \Drupal\Console\Generator\ControllerGenerator
      */
     protected function createGenerator()
     {
